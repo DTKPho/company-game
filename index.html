@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fondateur — Simulateur d'entreprise</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#171d2b; --panel2:#1d2536; --border:#2a3348;
+    --text:#e7ecf5; --muted:#9aa5ba; --green:#22c55e; --red:#ef4444;
+    --blue:#3b82f6; --purple:#a855f7; --amber:#f59e0b; --teal:#14b8a6;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:linear-gradient(180deg,#0b0f18,#131a29 40%,#0f1420);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;}
+  h1,h2,h3{margin:0 0 8px;}
+  p{margin:4px 0;}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;padding:9px 14px;font-size:14px;
+    background:var(--panel2);color:var(--text);transition:transform .05s, background .15s;}
+  button:hover{background:#242e45;}
+  button:active{transform:scale(0.97);}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+  input,select{font-family:inherit;background:#0d1220;color:var(--text);border:1px solid var(--border);
+    border-radius:6px;padding:8px 10px;font-size:14px;}
+  input:focus,select:focus{outline:1px solid var(--blue);}
+  .btn-primary{background:linear-gradient(135deg,var(--green),#16a34a);color:#08240f;font-weight:700;}
+  .btn-primary:hover{background:linear-gradient(135deg,#34d466,var(--green));}
+  .btn-large{padding:14px 22px;font-size:16px;border-radius:10px;}
+  .btn-ghost{background:transparent;border:1px solid var(--border);}
+  .btn-danger{background:#3a1620;color:#ff9c9c;}
+  .btn-danger:hover{background:#4a1c28;}
+  .badge{display:inline-block;background:#233047;color:var(--muted);border-radius:20px;padding:3px 10px;font-size:12px;margin-left:6px;}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px;}
+
+  /* Start screen */
+  .start-screen{max-width:820px;margin:0 auto;padding:40px 20px 60px;}
+  .start-screen h1{font-size:28px;}
+  .subtitle{color:var(--muted);margin-bottom:24px;}
+  .continue-banner{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;
+    margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+  .form-section label{display:block;font-weight:600;margin:20px 0 8px;color:#cdd6e8;}
+  #companyNameInput{width:100%;padding:12px;font-size:15px;}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+  .opt-card{background:var(--panel);border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:.15s;}
+  .opt-card:hover{border-color:#3a4a6a;}
+  .opt-card.selected{border-color:var(--green);background:#132318;}
+  .opt-card .oc-title{font-weight:700;font-size:15px;margin-bottom:4px;}
+  .opt-card .oc-desc{color:var(--muted);font-size:12.5px;line-height:1.5;}
+  .start-cta{margin-top:28px;text-align:center;}
+
+  /* Game screen */
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--panel);
+    border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;flex-wrap:wrap;gap:8px;}
+  .topbar-left{font-size:16px;}
+  .topbar-right{display:flex;align-items:center;gap:12px;color:var(--muted);}
+  .month-pill{background:#0d1220;border:1px solid var(--border);border-radius:20px;padding:5px 14px;color:var(--text);font-weight:600;}
+
+  .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0;}
+  .stat-card{background:var(--panel);border-radius:12px;padding:14px 16px;border-left:4px solid var(--border);}
+  .stat-card .sc-label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
+  .stat-card .sc-value{font-size:21px;font-weight:700;margin-top:4px;}
+  .stat-card .sc-sub{color:var(--muted);font-size:12px;margin-top:4px;}
+  .stat-card.cash{border-color:var(--green);} .stat-card.revenue{border-color:var(--blue);}
+  .stat-card.margin{border-color:var(--teal);} .stat-card.team{border-color:#e2b93b;}
+  .stat-card.personal{border-color:var(--amber);} .stat-card.valuation{border-color:var(--purple);}
+  .stat-card.equity{border-color:#f472b6;}
+  .neg{color:var(--red);} .pos{color:var(--green);}
+
+  .charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:18px;}
+  .chart-box{background:var(--panel);border-radius:12px;padding:12px 14px;}
+  .chart-box h4{margin:0 0 6px;font-size:13px;color:var(--muted);font-weight:600;}
+  .chart-box canvas{width:100%;height:90px;display:block;}
+
+  .main-columns{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start;}
+  @media(max-width:900px){.main-columns{grid-template-columns:1fr;}}
+  .panel{background:var(--panel);border-radius:12px;padding:16px 18px;margin-bottom:16px;}
+  .decision-block{border-top:1px solid var(--border);padding:14px 0;}
+  .decision-block:first-child{border-top:none;padding-top:0;}
+  .decision-block h3{font-size:14.5px;}
+  .decision-block .hint{color:var(--muted);font-size:12px;}
+  .preset-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .preset-row button{padding:6px 10px;font-size:12.5px;}
+  .role-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px;}
+  .role-card{background:var(--panel2);border-radius:10px;padding:10px;font-size:12.5px;}
+  .role-card .rc-title{font-weight:700;margin-bottom:2px;}
+  .role-card .rc-cost{color:var(--muted);margin-bottom:6px;}
+  .role-card button{width:100%;font-size:12.5px;padding:6px;}
+  .emp-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .emp-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel2);
+    border-radius:8px;padding:6px 10px;font-size:12.5px;}
+  .emp-row button{padding:4px 8px;font-size:11.5px;}
+  .field-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+  .field-row input[type=number]{width:130px;}
+  .field-row select{flex:1;min-width:140px;}
+  .funding-preview{color:var(--purple);font-size:12.5px;margin-top:6px;font-weight:600;}
+  .advance-btn{width:100%;margin-top:6px;}
+  .explosion-hint{background:#2a1a08;border:1px solid #6b3d0c;color:#ffb454;border-radius:10px;
+    padding:10px 12px;font-size:12.5px;margin-bottom:14px;}
+
+  .history-list{display:flex;flex-direction:column;gap:8px;max-height:640px;overflow-y:auto;}
+  .hist-item{background:var(--panel2);border-radius:8px;padding:8px 10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--border);}
+  .hist-item .hm{color:var(--muted);font-weight:700;margin-right:6px;}
+  .hist-item.t-event-pos{border-color:var(--green);}
+  .hist-item.t-event-neg{border-color:var(--red);}
+  .hist-item.t-funding{border-color:var(--purple);}
+  .hist-item.t-explosion,.hist-item.t-explosion-choice{border-color:var(--amber);}
+  .hist-item.t-hire{border-color:var(--blue);}
+  .hist-item.t-fire{border-color:#e2b93b;}
+  .hist-item.t-gameover{border-color:var(--red);background:#2a1113;}
+  .hist-item.t-dividend{border-color:var(--teal);}
+
+  .overlay{position:fixed;inset:0;background:rgba(4,7,14,.72);display:flex;align-items:center;justify-content:center;
+    padding:20px;z-index:50;}
+  .modal{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:26px;max-width:520px;width:100%;
+    max-height:85vh;overflow-y:auto;}
+  .modal h2{margin-bottom:10px;}
+  .modal .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
+  .modal .summary-cell{background:var(--panel2);border-radius:8px;padding:10px;font-size:12.5px;}
+  .modal .summary-cell b{display:block;font-size:15px;margin-top:2px;}
+  .modal .events-list{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin:10px 0;}
+  .modal .events-list .hist-item{border-left:3px solid var(--border);}
+  .explosion-choices{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+  .explosion-choices button{text-align:left;padding:12px 14px;background:var(--panel2);border:1px solid var(--border);}
+  .explosion-choices button b{display:block;margin-bottom:3px;}
+  .explosion-choices button span{color:var(--muted);font-size:12.5px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+  .footer-note{color:var(--muted);font-size:11.5px;text-align:center;margin:26px 0 4px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============================= DONNÉES DE JEU ============================= */
+
+const SECTORS = {
+  saas: {
+    key:'saas', label:'SaaS (logiciel en abonnement)', icon:'💻',
+    startCash:45000, startCustomers:8,
+    arpu:49, cac:180, churnBase:0.035, grossMargin:0.78,
+    fixedCosts:850, baseMultiple:5.0, unitLabel:'clients abonnés',
+    capacityBase:18, capacityPerSales:14, capacityPerTech:5,
+    desc:'Marges élevées, croissance récurrente, mais acquisition client coûteuse et churn à surveiller.'
+  },
+  ecommerce: {
+    key:'ecommerce', label:'E-commerce', icon:'🛒',
+    startCash:35000, startCustomers:40,
+    arpu:34, cac:20, churnBase:0.12, grossMargin:0.32,
+    fixedCosts:900, baseMultiple:1.3, unitLabel:'clients actifs/mois',
+    capacityBase:50, capacityPerSales:30, capacityPerTech:10,
+    desc:'Acquisition bon marché et volumes élevés, mais marges faibles et fidélisation difficile.'
+  },
+  service: {
+    key:'service', label:'Service / Conseil', icon:'🧑‍💼',
+    startCash:30000, startCustomers:3,
+    arpu:2100, cac:850, churnBase:0.03, grossMargin:0.5,
+    fixedCosts:900, baseMultiple:1.8, unitLabel:'clients / contrats',
+    capacityBase:2, capacityPerSales:1.5, capacityPerTech:1,
+    desc:'Contrats à forte valeur et clients fidèles, mais chaque client coûte cher à décrocher et la capacité de vente est limitée.'
+  }
+};
+
+const DIFFICULTIES = {
+  easy: {
+    key:'easy', label:'Facile', icon:'🟢',
+    growthMult:1.3, cacMult:0.85, churnMult:0.85,
+    eventNegProbMult:0.4, eventNegSeverityMult:0.55, eventPosProbMult:1.3,
+    bankruptcyGraceMonths:5, cashFloorFactor:-0.4,
+    desc:'Croissance généreuse, coups durs rares et légers, trésorerie qui pardonne les erreurs.'
+  },
+  normal: {
+    key:'normal', label:'Normal', icon:'🔵',
+    growthMult:1.0, cacMult:1.0, churnMult:1.0,
+    eventNegProbMult:0.85, eventNegSeverityMult:0.9, eventPosProbMult:1.05,
+    bankruptcyGraceMonths:4, cashFloorFactor:-0.22,
+    desc:'Équilibre standard. L\'échec est possible mais jamais gratuit.'
+  },
+  hard: {
+    key:'hard', label:'Difficile', icon:'🔴',
+    growthMult:0.8, cacMult:1.4, churnMult:1.25,
+    eventNegProbMult:1.7, eventNegSeverityMult:1.4, eventPosProbMult:0.8,
+    bankruptcyGraceMonths:1, cashFloorFactor:0,
+    desc:'Marges serrées, acquisition client chère, coups durs fréquents. La faillite guette vite.'
+  },
+  explosive: {
+    key:'explosive', label:'Explosion garantie', icon:'🌋',
+    growthMult:1.0, cacMult:1.0, churnMult:1.0,
+    eventNegProbMult:1.0, eventNegSeverityMult:1.0, eventPosProbMult:1.0,
+    bankruptcyGraceMonths:3, cashFloorFactor:-0.1, guaranteedExplosion:true,
+    desc:'Mode normal... jusqu\'à un pic d\'hypercroissance scripté, garanti entre le mois 12 et 30.'
+  }
+};
+
+const ROLES = {
+  sales:   { key:'sales',   label:'Commercial',    icon:'📈', salary:3200, effect:'Réduit le coût d\'acquisition et accélère les ventes.' },
+  support: { key:'support', label:'Support / Ops', icon:'🎧', salary:2600, effect:'Réduit le taux de résiliation (churn) des clients.' },
+  tech:    { key:'tech',    label:'Tech / Produit', icon:'🛠️', salary:4000, effect:'Améliore la marge et facilite l\'évolution produit.' }
+};
+
+const POSITIVE_EVENTS = [
+  { run(s){
+      const gain = Math.round(randBetween(0.06,0.15)*s.customers)+randInt(2,8);
+      s.customers += gain;
+      return `Un article ou un influenceur parle de vous : +${gain} ${SECTORS[s.sectorKey].unitLabel}.`;
+  }},
+  { run(s){
+      const amt = Math.round(randBetween(2000,6000));
+      s.cash += amt;
+      return `Vous obtenez une subvention / crédit d'impôt recherche : +${fmtEUR(amt)} en trésorerie.`;
+  }},
+  { run(s){
+      const amt = Math.round(randBetween(3000,9000));
+      s.cash += amt;
+      const c = randInt(2,6);
+      s.customers += c;
+      return `Un gros client signe un contrat exceptionnel : +${fmtEUR(amt)} et +${c} ${SECTORS[s.sectorKey].unitLabel}.`;
+  }},
+  { run(s){
+      const bonus = Math.round(s.marketingBudget*0.3)+200;
+      s.cash += bonus;
+      return `Le bouche-à-oreille dépasse toutes les attentes : +${fmtEUR(bonus)} de valeur générée.`;
+  }},
+  { run(s){
+      const amt = Math.round(randBetween(1000,3000));
+      s.cash += amt;
+      return `Un fournisseur vous accorde une remise inattendue sur vos coûts : +${fmtEUR(amt)}.`;
+  }}
+];
+
+const NEGATIVE_EVENTS = [
+  { run(s,diff){
+      const loss = Math.round(s.customers*0.08*diff.eventNegSeverityMult)+1;
+      s.customers = Math.max(0, s.customers-loss);
+      return `Panne technique majeure : ${loss} ${SECTORS[s.sectorKey].unitLabel} perdus.`;
+  }},
+  { run(s,diff){
+      const amt = Math.round(Math.max(400, s.cash*randBetween(0.03,0.08))*diff.eventNegSeverityMult);
+      s.cash -= amt;
+      return `Retard de paiement d'un client important : -${fmtEUR(amt)} de trésorerie ce mois-ci.`;
+  }},
+  { run(s,diff){
+      const amt = Math.round(Math.max(500, s.cash*randBetween(0.04,0.10))*diff.eventNegSeverityMult);
+      s.cash -= amt;
+      return `Redressement fiscal / charges imprévues : -${fmtEUR(amt)}.`;
+  }},
+  { run(s,diff){
+      if(s.employees.length===0){
+        const amt = Math.round(Math.max(300, s.cash*randBetween(0.015,0.04))*diff.eventNegSeverityMult);
+        s.cash -= amt;
+        return `Petit imprévu administratif : -${fmtEUR(amt)}.`;
+      }
+      const idx = randInt(0,s.employees.length-1);
+      const emp = s.employees[idx];
+      s.employees.splice(idx,1);
+      return `${ROLES[emp.role].label} clé démissionne. L'équipe compte un membre de moins.`;
+  }},
+  { run(s,diff){
+      const loss = Math.round(s.customers*0.06*diff.eventNegSeverityMult);
+      s.customers = Math.max(0, s.customers-loss);
+      return `Un concurrent casse les prix : ${loss} ${SECTORS[s.sectorKey].unitLabel} vous quittent.`;
+  }}
+];
+
+/* ============================= UTILITAIRES ============================= */
+
+function fmt(n){ return new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(Math.round(n||0)); }
+function fmtEUR(n){ return fmt(n)+' €'; }
+function fmtPct(n,d=1){ return (100*(n||0)).toFixed(d)+' %'; }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function randInt(a,b){ return Math.floor(a+Math.random()*(b-a+1)); }
+function randBetween(a,b){ return a+Math.random()*(b-a); }
+function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============================= LOGIQUE ÉCONOMIQUE ============================= */
+
+function countRoles(employees){
+  const r = {sales:0,support:0,tech:0};
+  employees.forEach(e=>{ r[e.role] = (r[e.role]||0)+1; });
+  return r;
+}
+
+function effectiveGrossMargin(s){
+  const sector = SECTORS[s.sectorKey];
+  const roles = countRoles(s.employees);
+  return clamp(sector.grossMargin + Math.min(0.1, roles.tech*0.015), 0.05, 0.95);
+}
+
+function acquisitionCapacity(s){
+  const sector = SECTORS[s.sectorKey];
+  const roles = countRoles(s.employees);
+  return sector.capacityBase + roles.sales*sector.capacityPerSales + roles.tech*sector.capacityPerTech;
+}
+
+function effectiveCACFor(s){
+  const sector = SECTORS[s.sectorKey];
+  const diff = DIFFICULTIES[s.difficultyKey];
+  const roles = countRoles(s.employees);
+  const salesBonus = Math.min(0.45, roles.sales*0.09);
+  return Math.max(1, sector.cac*(1-salesBonus)*diff.cacMult);
+}
+
+function acquisitionEfficiencyFor(s, budget){
+  const capacity = acquisitionCapacity(s);
+  const ratio = budget/(effectiveCACFor(s)*capacity);
+  return 1-Math.exp(-Math.max(0,ratio));
+}
+
+function efficientMarketingBudget(s, targetEfficiency){
+  const capacity = acquisitionCapacity(s);
+  // efficacité = 1-exp(-budget/(CAC*capacité)) -> on résout budget pour une efficacité cible
+  const ratio = -Math.log(1-clamp(targetEfficiency,0.01,0.99));
+  return Math.round(effectiveCACFor(s)*capacity*ratio);
+}
+
+function monthlyBurnEstimate(s){
+  const sector = SECTORS[s.sectorKey];
+  const salaries = s.employees.reduce((sum,e)=>sum+ROLES[e.role].salary,0);
+  const burn = salaries+sector.fixedCosts+s.marketingBudget - s.revenue*effectiveGrossMargin(s);
+  return Math.max(1, burn);
+}
+
+function estimateValuation(s){
+  const sector = SECTORS[s.sectorKey];
+  const annual = s.revenue*12;
+  const growth = s.lastRevenue>0 ? (s.revenue-s.lastRevenue)/s.lastRevenue : 0;
+  let multiple = sector.baseMultiple * clamp(1+growth*2.5, 0.5, 2.5);
+  const margin = effectiveGrossMargin(s);
+  multiple *= (0.6+margin);
+  let val = Math.max(annual*multiple, s.cash*0.8);
+  if(s.customers<=0 && s.revenue<=0) val = Math.max(s.cash*0.5, sector.startCash*0.3);
+  return Math.round(val);
+}
+
+function pushHistory(s,type,text){
+  s.history.unshift({month:s.month, type, text});
+  if(s.history.length>300) s.history.length = 300;
+}
+
+function snapshotChart(s){
+  s.chart.push({month:s.month, cash:s.cash, revenue:s.revenue, valuation:s.valuation, personalCash:s.personalCash});
+  if(s.chart.length>400) s.chart.shift();
+}
+
+function createNewGame(companyName, sectorKey, difficultyKey){
+  const sector = SECTORS[sectorKey];
+  const diff = DIFFICULTIES[difficultyKey];
+  const s = {
+    version:1,
+    companyName: companyName || 'Ma Startup',
+    sectorKey, difficultyKey,
+    month:0,
+    cash: sector.startCash,
+    personalCash: 0,
+    customers: sector.startCustomers,
+    revenue:0, lastRevenue:0, lastProfit:0, lastNewCustomers:0, lastChurned:0,
+    employees: [], nextEmployeeId:1,
+    productLevel:1,
+    marketingBudget: Math.round(sector.startCash*0.04),
+    salaryDraw:0,
+    playerEquity:1.0,
+    investors:[],
+    fundingRounds:0,
+    valuation:0,
+    history:[],
+    chart:[],
+    explosionMonth: diff.guaranteedExplosion ? randInt(12,30) : null,
+    explosionTriggered:false,
+    pendingExplosionChoice:false,
+    bankruptGrace:0,
+    gameOver:false,
+    gameOverReason:'',
+    createdAt: Date.now()
+  };
+  s.valuation = estimateValuation(s);
+  pushHistory(s,'start', `Création de ${escapeHtml(s.companyName)} — secteur ${sector.label}, difficulté ${diff.label}. Capital de départ : ${fmtEUR(sector.startCash)}.`);
+  if(diff.guaranteedExplosion){
+    pushHistory(s,'setting', `Ce mode contient un événement d'hypercroissance garanti, à un moment aléatoire avant le mois 30.`);
+  }
+  snapshotChart(s);
+  return s;
+}
+
+function processMonth(s){
+  if(s.gameOver) return null;
+  s.month++;
+  const sector = SECTORS[s.sectorKey];
+  const diff = DIFFICULTIES[s.difficultyKey];
+  const roles = countRoles(s.employees);
+
+  const salesBonus = Math.min(0.45, roles.sales*0.09);
+  const effectiveCAC = Math.max(1, sector.cac*(1-salesBonus)*diff.cacMult);
+  const supportBonus = Math.min(0.55, roles.support*0.11);
+  const effectiveChurn = clamp(sector.churnBase*diff.churnMult*(1-supportBonus)*(1-(s.productLevel-1)*0.015), 0.002, 0.9);
+
+  // La capacité d'acquisition est bornée par l'équipe (pas seulement par le budget) :
+  // au-delà d'un certain budget, dépenser plus ne suffit plus, il faut recruter pour absorber la croissance.
+  const capacity = acquisitionCapacity(s);
+  const budgetRatio = s.marketingBudget/(effectiveCAC*capacity);
+  const acquisitionEfficiency = 1-Math.exp(-Math.max(0,budgetRatio));
+  let newCustomers = capacity*acquisitionEfficiency*diff.growthMult*randBetween(0.85,1.15);
+  newCustomers += s.customers*0.005*diff.growthMult;
+  newCustomers = Math.round(Math.max(0,newCustomers));
+
+  const churned = Math.round(s.customers*effectiveChurn);
+  s.customers = Math.max(0, s.customers+newCustomers-churned);
+  s.lastNewCustomers = newCustomers;
+  s.lastChurned = churned;
+
+  const margin = effectiveGrossMargin(s);
+  const arpu = sector.arpu*(1+(s.productLevel-1)*0.06);
+  s.lastRevenue = s.revenue;
+  s.revenue = s.customers*arpu;
+
+  const cogs = s.revenue*(1-margin);
+  const salaries = s.employees.reduce((sum,e)=>sum+ROLES[e.role].salary,0);
+  const overhead = sector.fixedCosts + s.employees.length*180;
+  const marketingCost = s.marketingBudget;
+  const totalCosts = cogs+salaries+overhead+marketingCost;
+  const profit = s.revenue-totalCosts;
+  s.lastProfit = profit;
+
+  s.cash += profit;
+  s.cash -= s.salaryDraw;
+  s.personalCash += s.salaryDraw;
+
+  const ev = maybeTriggerEvent(s,diff);
+
+  if(diff.guaranteedExplosion && !s.explosionTriggered && s.month>=s.explosionMonth){
+    triggerExplosion(s);
+  }
+
+  s.valuation = estimateValuation(s);
+
+  const threshold2 = sector.startCash*diff.cashFloorFactor;
+  if(s.cash < threshold2){
+    s.bankruptGrace++;
+    if(s.bankruptGrace > diff.bankruptcyGraceMonths){
+      s.gameOver = true;
+      s.gameOverReason = 'faillite';
+      pushHistory(s,'gameover', `La trésorerie est à sec depuis trop longtemps. ${escapeHtml(s.companyName)} dépose le bilan.`);
+    }
+  } else {
+    s.bankruptGrace = 0;
+  }
+
+  snapshotChart(s);
+  return {newCustomers, churned, profit, event:ev};
+}
+
+function maybeTriggerEvent(s,diff){
+  const negProb = 0.13*diff.eventNegProbMult;
+  const posProb = 0.13*diff.eventPosProbMult;
+  const r = Math.random();
+  if(r<negProb){
+    const ev = choice(NEGATIVE_EVENTS);
+    const text = ev.run(s,diff);
+    pushHistory(s,'event-neg', `⚠️ ${text}`);
+    return {type:'neg', text};
+  } else if(r<negProb+posProb){
+    const ev = choice(POSITIVE_EVENTS);
+    const text = ev.run(s,diff);
+    pushHistory(s,'event-pos', `✨ ${text}`);
+    return {type:'pos', text};
+  }
+  return null;
+}
+
+function triggerExplosion(s){
+  s.explosionTriggered = true;
+  const mult = randBetween(3.5,6);
+  const before = s.customers;
+  s.customers = Math.round(s.customers*mult) + randInt(10,30);
+  s.pendingExplosionChoice = true;
+  pushHistory(s,'explosion', `🚀 Hypercroissance ! ${escapeHtml(s.companyName)} devient viral : les ${SECTORS[s.sectorKey].unitLabel} passent de ${before} à ${s.customers}.`);
+}
+
+function computeFundingOffer(s,sizeFactor){
+  return { amount: Math.round(s.valuation*sizeFactor) };
+}
+
+function acceptFunding(s, amount){
+  amount = Math.max(0, Math.round(amount));
+  if(amount<=0) return;
+  const preMoney = Math.max(1, s.valuation);
+  const dilution = amount/(preMoney+amount);
+  s.playerEquity *= (1-dilution);
+  s.investors.forEach(inv=>inv.pct*=(1-dilution));
+  s.investors.push({name:`Investisseur série ${s.fundingRounds+1}`, pct:dilution, round:s.fundingRounds+1, month:s.month});
+  s.fundingRounds++;
+  s.cash += amount;
+  s.valuation = preMoney+amount;
+  pushHistory(s,'funding', `Levée de fonds : +${fmtEUR(amount)} contre ${fmtPct(dilution)} du capital (valorisation pré-money ${fmtEUR(preMoney)}). Votre part tombe à ${fmtPct(s.playerEquity)}.`);
+}
+
+function acceptBuyout(s, pctOfPlayerStake){
+  const pctSold = s.playerEquity*pctOfPlayerStake;
+  const amount = Math.round(s.valuation*pctSold);
+  s.playerEquity -= pctSold;
+  s.investors.push({name:'Acheteur secondaire', pct:pctSold, round:0, month:s.month});
+  s.personalCash += amount;
+  pushHistory(s,'buyout', `Cession secondaire : vous vendez ${fmtPct(pctSold)} de vos parts pour ${fmtEUR(amount)}, versés directement sur votre compte personnel.`);
+}
+
+function upgradeProduct(s){
+  if(s.productLevel>=10) return false;
+  const cost = Math.round(6000*Math.pow(s.productLevel,1.35));
+  if(s.cash<cost) return false;
+  s.cash -= cost;
+  s.productLevel++;
+  pushHistory(s,'product', `Investissement produit : -${fmtEUR(cost)}, niveau produit désormais ${s.productLevel}/10.`);
+  return true;
+}
+
+function hireEmployee(s, role){
+  s.employees.push({id:s.nextEmployeeId++, role});
+  pushHistory(s,'hire', `Embauche : ${ROLES[role].label} (salaire ${fmtEUR(ROLES[role].salary)}/mois).`);
+}
+
+function fireEmployee(s, id){
+  const idx = s.employees.findIndex(e=>e.id===id);
+  if(idx<0) return;
+  const emp = s.employees[idx];
+  const severance = Math.round(ROLES[emp.role].salary*0.6);
+  s.cash -= severance;
+  s.employees.splice(idx,1);
+  pushHistory(s,'fire', `Licenciement : ${ROLES[emp.role].label} (indemnité ${fmtEUR(severance)}).`);
+}
+
+function payDividend(s, amount){
+  amount = Math.min(Math.max(0,Math.round(amount)), Math.max(0,s.cash));
+  if(amount<=0) return;
+  s.cash -= amount;
+  s.personalCash += amount;
+  pushHistory(s,'dividend', `Dividende versé : ${fmtEUR(amount)} vers votre compte personnel.`);
+}
+
+/* ============================= SIMULATION RAPIDE ============================= */
+
+function canAffordHire(s, role, minMonthsRunwayAfter){
+  const projectedSalaries = s.employees.reduce((sum,e)=>sum+ROLES[e.role].salary,0) + ROLES[role].salary;
+  const sector = SECTORS[s.sectorKey];
+  const projectedBurn = Math.max(1, projectedSalaries + sector.fixedCosts - s.revenue*effectiveGrossMargin(s));
+  return (s.cash/projectedBurn) >= minMonthsRunwayAfter;
+}
+
+// Plafonne le budget marketing pour garantir un nombre de mois de trésorerie restante après dépense.
+function capMarketingToRunway(s, desiredBudget, targetRunwayMonths){
+  const sector = SECTORS[s.sectorKey];
+  const grossProfitNow = s.revenue*effectiveGrossMargin(s);
+  const salaries = s.employees.reduce((sum,e)=>sum+ROLES[e.role].salary,0);
+  const nonMarketingBurn = salaries + sector.fixedCosts + s.employees.length*180 - grossProfitNow;
+  const maxMarketing = (s.cash/targetRunwayMonths) - nonMarketingBurn;
+  return Math.max(0, Math.min(desiredBudget, Math.round(maxMarketing)));
+}
+
+function applyStrategyDecisions(s, strategy){
+  const sector = SECTORS[s.sectorKey];
+
+  if(strategy==='growth'){
+    const role = choice(['sales','sales','tech']);
+    if(canAffordHire(s, role, 6) && Math.random()<0.22) hireEmployee(s, role);
+    if(canAffordHire(s,'support',7) && Math.random()<0.12) upgradeProduct(s);
+    // la cible d'efficacité monte progressivement avec la maturité de l'entreprise, pour éviter la surchauffe day-1
+    const targetEff = clamp(0.25+s.month*0.015, 0.25, 0.72);
+    s.marketingBudget = capMarketingToRunway(s, efficientMarketingBudget(s,targetEff), 6);
+    s.salaryDraw = Math.round(Math.min(1200, s.revenue*0.025));
+  } else if(strategy==='profit'){
+    const role = choice(['sales','support','tech']);
+    if(canAffordHire(s, role, 7) && Math.random()<0.18) hireEmployee(s, role);
+    if(canAffordHire(s,'support',8) && Math.random()<0.15) upgradeProduct(s);
+    s.marketingBudget = capMarketingToRunway(s, efficientMarketingBudget(s,0.65), 7);
+    s.salaryDraw = Math.round(Math.min(3000, s.revenue*0.1));
+    if(canAffordHire(s,'support',15) && Math.random()<0.15) payDividend(s, Math.round(s.cash*0.06));
+  } else {
+    if(canAffordHire(s,'support',14) && Math.random()<0.06) hireEmployee(s, choice(['support','sales']));
+    s.marketingBudget = capMarketingToRunway(s, efficientMarketingBudget(s,0.45), 10);
+    s.salaryDraw = Math.round(Math.min(800, s.revenue*0.015));
+  }
+}
+
+function autoResolveExplosion(s, strategy, notableEvents){
+  s.pendingExplosionChoice = false;
+  if(strategy==='growth'){
+    const {amount} = computeFundingOffer(s,0.30);
+    acceptFunding(s, amount);
+  } else if(strategy==='profit'){
+    acceptBuyout(s,0.15);
+  } else {
+    pushHistory(s,'explosion-choice', `Vous restez indépendant malgré l'opportunité, pour garder le contrôle.`);
+  }
+  notableEvents.push({month:s.month, text:s.history[0].text, type:s.history[0].type});
+}
+
+function simulateMonths(s, n, strategy){
+  const startSnap = {month:s.month, cash:s.cash, revenue:s.revenue, employees:s.employees.length, valuation:s.valuation, personalCash:s.personalCash};
+  const notableEvents = [];
+  let ranMonths = 0;
+  for(let i=0;i<n;i++){
+    if(s.gameOver) break;
+    applyStrategyDecisions(s, strategy);
+    const result = processMonth(s);
+    ranMonths++;
+    if(result && result.event){
+      notableEvents.push({month:s.month, text:s.history[0].text, type:s.history[0].type});
+    }
+    if(s.pendingExplosionChoice){
+      autoResolveExplosion(s, strategy, notableEvents);
+    }
+    if(s.gameOver){
+      notableEvents.push({month:s.month, text:`Faillite : ${escapeHtml(s.companyName)} a dû fermer.`, type:'gameover'});
+      break;
+    }
+  }
+  const endSnap = {month:s.month, cash:s.cash, revenue:s.revenue, employees:s.employees.length, valuation:s.valuation, personalCash:s.personalCash};
+  return {startSnap, endSnap, notableEvents, monthsRun:ranMonths, strategy};
+}
+
+/* ============================= ÉTAT GLOBAL & PERSISTANCE ============================= */
+
+const SAVE_KEY = 'company_sim_save_v1';
+const G = { screen:'start', state:null, hasSave:false, savedPreview:null, showSimSummary:false, lastSimSummary:null };
+let startFormState = { name:'', sector:'saas', difficulty:'normal' };
+
+function saveGame(){
+  if(G.state) localStorage.setItem(SAVE_KEY, JSON.stringify(G.state));
+}
+function loadSavedState(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+function clearSave(){ localStorage.removeItem(SAVE_KEY); }
+
+function init(){
+  const saved = loadSavedState();
+  if(saved){ G.hasSave = true; G.savedPreview = saved; }
+  G.screen = 'start';
+  render();
+}
+
+/* ============================= ACTIONS (appelées depuis le DOM) ============================= */
+
+function selectSector(key){ startFormState.sector = key; render(); }
+function selectDifficulty(key){ startFormState.difficulty = key; render(); }
+
+function startGame(){
+  const nameInput = document.getElementById('companyNameInput');
+  if(nameInput) startFormState.name = nameInput.value;
+  const name = (startFormState.name||'').trim() || 'Ma Startup';
+  G.state = createNewGame(name, startFormState.sector, startFormState.difficulty);
+  G.screen = 'game';
+  render();
+}
+
+function continueGame(){
+  const saved = loadSavedState();
+  if(saved){ G.state = saved; G.screen = 'game'; render(); }
+}
+
+function confirmNewGame(){
+  if(G.state && !G.state.gameOver){
+    if(!confirm("Voulez-vous vraiment quitter la partie en cours pour en démarrer une nouvelle ? Elle sera définitivement perdue.")) return;
+  }
+  G.state = null;
+  G.screen = 'start';
+  G.showSimSummary = false;
+  render();
+}
+
+function advanceMonth(){
+  const s = G.state;
+  if(!s || s.gameOver) return;
+  processMonth(s);
+  render();
+}
+
+function setMarketingBudget(val){
+  const s = G.state; if(!s) return;
+  const nv = Math.max(0, Math.round(Number(val)||0));
+  const changeRatio = s.marketingBudget>0 ? Math.abs(nv-s.marketingBudget)/s.marketingBudget : (nv>0?2:0);
+  s.marketingBudget = nv;
+  if(changeRatio>0.4) pushHistory(s,'setting', `Budget marketing ajusté à ${fmtEUR(nv)}/mois.`);
+  render();
+}
+
+function setSalaryDraw(val){
+  const s = G.state; if(!s) return;
+  const nv = Math.max(0, Math.round(Number(val)||0));
+  const changeRatio = s.salaryDraw>0 ? Math.abs(nv-s.salaryDraw)/s.salaryDraw : (nv>0?2:0);
+  s.salaryDraw = nv;
+  if(changeRatio>0.4) pushHistory(s,'setting', `Salaire mensuel prélevé ajusté à ${fmtEUR(nv)}/mois.`);
+  render();
+}
+
+function doHire(role){ const s=G.state; if(!s) return; hireEmployee(s, role); render(); }
+function doFire(id){
+  const s = G.state; if(!s) return;
+  if(!confirm('Confirmer le licenciement ? Une indemnité sera versée.')) return;
+  fireEmployee(s, id); render();
+}
+function doUpgradeProduct(){ const s=G.state; if(!s) return; upgradeProduct(s); render(); }
+
+function doPayDividend(){
+  const s = G.state; if(!s) return;
+  const input = document.getElementById('dividendInput');
+  const amt = Math.max(0, Math.round(Number(input.value)||0));
+  if(amt<=0) return;
+  payDividend(s, amt); render();
+}
+
+function updateFundingPreview(){
+  const s = G.state; if(!s) return;
+  const input = document.getElementById('fundingAmountInput');
+  const preview = document.getElementById('fundingPreview');
+  if(!input || !preview) return;
+  const amt = Math.max(0, Number(input.value)||0);
+  const dilution = amt>0 ? amt/(s.valuation+amt) : 0;
+  const newPlayerEquity = s.playerEquity*(1-dilution);
+  preview.textContent = amt>0
+    ? `Dilution : ${fmtPct(dilution)} — vos parts passeraient de ${fmtPct(s.playerEquity)} à ${fmtPct(newPlayerEquity)}.`
+    : `Entrez un montant pour voir l'effet sur vos parts.`;
+}
+
+function raiseFunds(){
+  const s = G.state; if(!s) return;
+  const input = document.getElementById('fundingAmountInput');
+  const amt = Math.max(0, Math.round(Number(input.value)||0));
+  if(amt<=0) return;
+  if(amt > s.valuation*0.9){
+    if(!confirm('Cette levée est très importante et diluera fortement votre capital. Continuer ?')) return;
+  }
+  acceptFunding(s, amt); render();
+}
+
+function chooseExplosionFunding(){
+  const s = G.state; if(!s) return;
+  s.pendingExplosionChoice = false;
+  const {amount} = computeFundingOffer(s,0.30);
+  acceptFunding(s, amount); render();
+}
+function chooseExplosionBuyout(){
+  const s = G.state; if(!s) return;
+  s.pendingExplosionChoice = false;
+  acceptBuyout(s,0.20); render();
+}
+function chooseExplosionIndependent(){
+  const s = G.state; if(!s) return;
+  s.pendingExplosionChoice = false;
+  pushHistory(s,'explosion-choice', `Vous choisissez de rester indépendant et de poursuivre la croissance sans lever de fonds.`);
+  render();
+}
+
+function doFastSimulate(){
+  const s = G.state; if(!s || s.gameOver) return;
+  const monthsInput = document.getElementById('simMonthsInput');
+  const strategySelect = document.getElementById('simStrategySelect');
+  const n = clamp(Math.round(Number(monthsInput.value)||0), 1, 120);
+  const strategy = strategySelect.value;
+  const result = simulateMonths(s, n, strategy);
+  G.lastSimSummary = result;
+  G.showSimSummary = true;
+  render();
+}
+function closeSimSummary(){ G.showSimSummary = false; render(); }
+
+window.onload = init;
+
+/* ============================= RENDU ============================= */
+
+function render(){
+  const app = document.getElementById('app');
+  if(G.screen==='start' || !G.state){
+    app.innerHTML = renderStartHTML();
+  } else {
+    app.innerHTML = renderGameHTML();
+    renderCharts();
+    updateFundingPreview();
+    saveGame();
+  }
+}
+
+function renderStartHTML(){
+  const sectorCards = Object.values(SECTORS).map(sec=>`
+    <div class="opt-card ${startFormState.sector===sec.key?'selected':''}" onclick="selectSector('${sec.key}')">
+      <div class="oc-title">${sec.icon} ${sec.label}</div>
+      <div class="oc-desc">${sec.desc}<br>Capital de départ : ${fmtEUR(sec.startCash)}</div>
+    </div>`).join('');
+
+  const diffCards = Object.values(DIFFICULTIES).map(d=>`
+    <div class="opt-card ${startFormState.difficulty===d.key?'selected':''}" onclick="selectDifficulty('${d.key}')">
+      <div class="oc-title">${d.icon} ${d.label}</div>
+      <div class="oc-desc">${d.desc}</div>
+    </div>`).join('');
+
+  let banner = '';
+  if(G.hasSave && G.savedPreview){
+    const sp = G.savedPreview;
+    if(sp.gameOver){
+      banner = `<div class="continue-banner">
+        <div>Une précédente partie (${escapeHtml(sp.companyName)}) s'est terminée par une faillite au mois ${sp.month}.</div>
+        <button class="btn-ghost" onclick="clearSaveAndRefresh()">Effacer</button>
+      </div>`;
+    } else {
+      banner = `<div class="continue-banner">
+        <div>Partie en cours : <strong>${escapeHtml(sp.companyName)}</strong> — Mois ${sp.month}, trésorerie ${fmtEUR(sp.cash)}.</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-primary" onclick="continueGame()">▶️ Continuer</button>
+        </div>
+      </div>`;
+    }
+  }
+
+  return `
+  <div class="wrap start-screen">
+    <h1>🏢 Fondateur — Simulateur d'entreprise</h1>
+    <p class="subtitle">Démarrez votre société, prenez les bonnes décisions mois après mois, et construisez une valorisation qui compte.</p>
+    ${banner}
+    <div class="form-section">
+      <label for="companyNameInput">Nom de l'entreprise</label>
+      <input id="companyNameInput" type="text" maxlength="30" placeholder="ex : Nova Labs"
+        value="${escapeHtml(startFormState.name)}" oninput="startFormState.name=this.value">
+
+      <label>Secteur d'activité</label>
+      <div class="card-grid">${sectorCards}</div>
+
+      <label>Difficulté</label>
+      <div class="card-grid">${diffCards}</div>
+    </div>
+    <div class="start-cta">
+      <button class="btn-primary btn-large" onclick="startGame()">🚀 Lancer l'entreprise</button>
+    </div>
+    <p class="footer-note">Partie sauvegardée automatiquement dans votre navigateur (localStorage).</p>
+  </div>`;
+}
+
+function clearSaveAndRefresh(){ clearSave(); G.hasSave=false; G.savedPreview=null; render(); }
+
+function renderGameHTML(){
+  const s = G.state;
+  const sector = SECTORS[s.sectorKey];
+  const diff = DIFFICULTIES[s.difficultyKey];
+  const roles = countRoles(s.employees);
+  const margin = effectiveGrossMargin(s);
+  const netMarginPct = s.revenue>0 ? (s.lastProfit/s.revenue) : 0;
+  const runwayMonths = s.cash>0 ? (s.cash/monthlyBurnEstimate(s)) : 0;
+
+  const cashClass = s.cash<0 ? 'neg' : '';
+  const growthPct = s.lastRevenue>0 ? (s.revenue-s.lastRevenue)/s.lastRevenue : 0;
+
+  const dashboard = `
+  <section class="dashboard-grid">
+    <div class="stat-card cash">
+      <div class="sc-label">Trésorerie</div>
+      <div class="sc-value ${cashClass}">${fmtEUR(s.cash)}</div>
+      <div class="sc-sub">${runwayMonths>0 && isFinite(runwayMonths) ? '~'+Math.max(0,Math.round(runwayMonths))+' mois de trésorerie restante' : 'Rentable ou stable'}</div>
+    </div>
+    <div class="stat-card revenue">
+      <div class="sc-label">CA mensuel</div>
+      <div class="sc-value">${fmtEUR(s.revenue)}</div>
+      <div class="sc-sub">${growthPct>=0?'+':''}${fmtPct(growthPct)} vs mois précédent</div>
+    </div>
+    <div class="stat-card margin">
+      <div class="sc-label">Marge</div>
+      <div class="sc-value">${fmtPct(margin,0)}</div>
+      <div class="sc-sub">Résultat net : <span class="${s.lastProfit<0?'neg':'pos'}">${fmtEUR(s.lastProfit)}</span>/mois</div>
+    </div>
+    <div class="stat-card team">
+      <div class="sc-label">Effectif</div>
+      <div class="sc-value">${s.employees.length}</div>
+      <div class="sc-sub">📈${roles.sales} 🎧${roles.support} 🛠️${roles.tech}</div>
+    </div>
+    <div class="stat-card personal">
+      <div class="sc-label">Argent personnel</div>
+      <div class="sc-value">${fmtEUR(s.personalCash)}</div>
+      <div class="sc-sub">Salaire + dividendes cumulés</div>
+    </div>
+    <div class="stat-card valuation">
+      <div class="sc-label">Valorisation estimée</div>
+      <div class="sc-value">${fmtEUR(s.valuation)}</div>
+      <div class="sc-sub">${s.fundingRounds} levée(s) de fonds</div>
+    </div>
+    <div class="stat-card equity">
+      <div class="sc-label">Parts détenues</div>
+      <div class="sc-value">${fmtPct(s.playerEquity)}</div>
+      <div class="sc-sub">${s.investors.length} investisseur(s) au capital</div>
+    </div>
+  </section>`;
+
+  const charts = `
+  <section class="charts-grid">
+    <div class="chart-box"><h4>Trésorerie</h4><canvas id="chartCash"></canvas></div>
+    <div class="chart-box"><h4>CA mensuel</h4><canvas id="chartRevenue"></canvas></div>
+    <div class="chart-box"><h4>Valorisation</h4><canvas id="chartValuation"></canvas></div>
+    <div class="chart-box"><h4>Argent personnel</h4><canvas id="chartPersonal"></canvas></div>
+  </section>`;
+
+  const explosionHint = (diff.guaranteedExplosion && !s.explosionTriggered && (s.explosionMonth-s.month)<=3 && (s.explosionMonth-s.month)>=0)
+    ? `<div class="explosion-hint">🌋 Quelque chose de grand semble se préparer dans les prochains mois...</div>` : '';
+
+  const roleCards = Object.values(ROLES).map(r=>`
+    <div class="role-card">
+      <div class="rc-title">${r.icon} ${r.label}</div>
+      <div class="rc-cost">${fmtEUR(r.salary)}/mois — ${r.effect}</div>
+      <button onclick="doHire('${r.key}')">Embaucher</button>
+    </div>`).join('');
+
+  const empList = s.employees.length===0
+    ? `<p class="hint">Aucun employé pour le moment.</p>`
+    : `<div class="emp-list">${s.employees.map(e=>`
+      <div class="emp-row">
+        <span>${ROLES[e.role].icon} ${ROLES[e.role].label}</span>
+        <button class="btn-danger" onclick="doFire(${e.id})">Licencier</button>
+      </div>`).join('')}</div>`;
+
+  const nextUpgradeCost = s.productLevel<10 ? Math.round(6000*Math.pow(s.productLevel,1.35)) : null;
+
+  const capacity = acquisitionCapacity(s);
+  const budgetForCapacity = efficientMarketingBudget(s,0.90);
+  const currentEfficiency = acquisitionEfficiencyFor(s, s.marketingBudget);
+
+  const decisionsPanel = `
+  <div class="panel">
+    ${explosionHint}
+    <div class="decision-block">
+      <h3>📣 Marketing</h3>
+      <p class="hint">Budget mensuel récurrent. Au-delà de la capacité d'acquisition de votre équipe, chaque euro supplémentaire rapporte de moins en moins : recrutez pour l'augmenter.</p>
+      <p class="hint">Capacité d'acquisition actuelle : <strong>~${Math.round(capacity)} ${sector.unitLabel}/mois</strong> au maximum. Budget efficace (~90%) : <strong>${fmtEUR(budgetForCapacity)}</strong>. Efficacité de votre budget actuel : <strong>${fmtPct(currentEfficiency,0)}</strong>.</p>
+      <div class="field-row">
+        <input type="number" id="marketingInput" min="0" step="100" value="${s.marketingBudget}" onchange="setMarketingBudget(this.value)">
+        <span class="hint">€/mois</span>
+      </div>
+      <div class="preset-row">
+        <button onclick="setMarketingBudget(0)">0 €</button>
+        <button onclick="setMarketingBudget(1000)">1 000 €</button>
+        <button onclick="setMarketingBudget(${budgetForCapacity})">Budget efficace (~90%)</button>
+      </div>
+    </div>
+
+    <div class="decision-block">
+      <h3>🧑‍🤝‍🧑 Équipe</h3>
+      <p class="hint">Chaque rôle a un effet différent sur la croissance, le churn ou la marge.</p>
+      <div class="role-grid">${roleCards}</div>
+      ${empList}
+    </div>
+
+    <div class="decision-block">
+      <h3>🛠️ Produit</h3>
+      <p class="hint">Niveau actuel : <strong>${s.productLevel}/10</strong>. Augmente le prix perçu et réduit le churn.</p>
+      ${nextUpgradeCost!==null
+        ? `<button class="btn-primary" ${s.cash<nextUpgradeCost?'disabled':''} onclick="doUpgradeProduct()">Améliorer le produit — ${fmtEUR(nextUpgradeCost)}</button>`
+        : `<p class="hint">Produit au niveau maximum.</p>`}
+    </div>
+
+    <div class="decision-block">
+      <h3>💰 Lever des fonds</h3>
+      <p class="hint">Valorisation pré-money actuelle : <strong>${fmtEUR(s.valuation)}</strong>. Une levée dilue votre capital.</p>
+      <div class="field-row">
+        <input type="number" id="fundingAmountInput" min="0" step="1000" value="${Math.round(s.valuation*0.2)}" oninput="updateFundingPreview()">
+        <span class="hint">€ à lever</span>
+        <button class="btn-primary" onclick="raiseFunds()">Lever les fonds</button>
+      </div>
+      <div id="fundingPreview" class="funding-preview"></div>
+    </div>
+
+    <div class="decision-block">
+      <h3>🏦 Rémunération personnelle</h3>
+      <p class="hint">Salaire mensuel prélevé sur la trésorerie de l'entreprise.</p>
+      <div class="field-row">
+        <input type="number" id="salaryInput" min="0" step="100" value="${s.salaryDraw}" onchange="setSalaryDraw(this.value)">
+        <span class="hint">€/mois</span>
+      </div>
+      <p class="hint" style="margin-top:10px;">Verser un dividende exceptionnel (une fois) :</p>
+      <div class="field-row">
+        <input type="number" id="dividendInput" min="0" step="500" value="0" max="${Math.max(0,Math.round(s.cash))}">
+        <button onclick="doPayDividend()">Verser</button>
+      </div>
+    </div>
+
+    <button class="btn-primary btn-large advance-btn" onclick="advanceMonth()">⏭️ Passer au mois suivant</button>
+
+    <div class="decision-block">
+      <h3>⚡ Simulation rapide</h3>
+      <p class="hint">Joue automatiquement plusieurs mois selon une stratégie, puis affiche un résumé condensé.</p>
+      <div class="field-row">
+        <input type="number" id="simMonthsInput" min="1" max="120" value="6">
+        <select id="simStrategySelect">
+          <option value="growth">Prioriser la croissance</option>
+          <option value="profit">Prioriser la rentabilité</option>
+          <option value="prudent">Jouer prudemment</option>
+        </select>
+      </div>
+      <button class="btn-primary" style="margin-top:8px;" onclick="doFastSimulate()">▶️ Lancer la simulation</button>
+    </div>
+  </div>`;
+
+  const historyPanel = `
+  <div class="panel">
+    <h3>📜 Historique des décisions</h3>
+    <div class="history-list">
+      ${s.history.map(h=>`
+        <div class="hist-item t-${h.type}">
+          <span class="hm">Mois ${h.month}</span>${h.text}
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+  let modal = '';
+  if(s.pendingExplosionChoice){
+    modal = `
+    <div class="overlay">
+      <div class="modal">
+        <h2>🚀 Hypercroissance !</h2>
+        <p>${escapeHtml(s.companyName)} explose en popularité. C'est le moment de choisir votre trajectoire.</p>
+        <div class="explosion-choices">
+          <button onclick="chooseExplosionFunding()"><b>💰 Lever des fonds massivement</b><span>Levée importante (~30% de la valorisation), forte dilution mais trésorerie boostée pour accélérer.</span></button>
+          <button onclick="chooseExplosionBuyout()"><b>🤝 Céder une partie de vos parts (secondaire)</b><span>Vendez ~20% de vos propres parts, cash immédiat sur votre compte personnel.</span></button>
+          <button onclick="chooseExplosionIndependent()"><b>🧭 Rester indépendant</b><span>Aucune dilution, vous gardez le contrôle total et poursuivez seul.</span></button>
+        </div>
+      </div>
+    </div>`;
+  } else if(s.gameOver){
+    modal = `
+    <div class="overlay">
+      <div class="modal">
+        <h2>💀 Faillite</h2>
+        <p>${escapeHtml(s.companyName)} a fermé ses portes au mois ${s.month}, après une trésorerie durablement négative.</p>
+        <div class="summary-grid">
+          <div class="summary-cell">CA mensuel final<b>${fmtEUR(s.revenue)}</b></div>
+          <div class="summary-cell">Effectif final<b>${s.employees.length}</b></div>
+          <div class="summary-cell">Argent personnel conservé<b>${fmtEUR(s.personalCash)}</b></div>
+          <div class="summary-cell">Parts détenues<b>${fmtPct(s.playerEquity)}</b></div>
+        </div>
+        <p class="hint">Bonne nouvelle : votre argent personnel déjà prélevé est à l'abri, la faillite ne touche que l'entreprise.</p>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="confirmNewGame()">🔄 Nouvelle partie</button>
+        </div>
+      </div>
+    </div>`;
+  } else if(G.showSimSummary && G.lastSimSummary){
+    const r = G.lastSimSummary;
+    const stratLabel = {growth:'Prioriser la croissance', profit:'Prioriser la rentabilité', prudent:'Jouer prudemment'}[r.strategy]||r.strategy;
+    modal = `
+    <div class="overlay">
+      <div class="modal">
+        <h2>⚡ Résumé de la simulation rapide</h2>
+        <p class="hint">${r.monthsRun} mois simulés (mois ${r.startSnap.month} → ${r.endSnap.month}) — stratégie : <strong>${stratLabel}</strong></p>
+        <div class="summary-grid">
+          <div class="summary-cell">Trésorerie<b>${fmtEUR(r.startSnap.cash)} → ${fmtEUR(r.endSnap.cash)}</b></div>
+          <div class="summary-cell">CA mensuel<b>${fmtEUR(r.startSnap.revenue)} → ${fmtEUR(r.endSnap.revenue)}</b></div>
+          <div class="summary-cell">Effectif<b>${r.startSnap.employees} → ${r.endSnap.employees}</b></div>
+          <div class="summary-cell">Valorisation<b>${fmtEUR(r.startSnap.valuation)} → ${fmtEUR(r.endSnap.valuation)}</b></div>
+          <div class="summary-cell">Argent personnel<b>${fmtEUR(r.startSnap.personalCash)} → ${fmtEUR(r.endSnap.personalCash)}</b></div>
+        </div>
+        <h3 style="font-size:14px;margin-top:16px;">Événements marquants</h3>
+        <div class="events-list">
+          ${r.notableEvents.length===0 ? '<p class="hint">Aucun événement notable pendant cette période.</p>' :
+            r.notableEvents.map(e=>`<div class="hist-item t-${e.type}"><span class="hm">Mois ${e.month}</span>${e.text}</div>`).join('')}
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="closeSimSummary()">Fermer</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  return `
+  <header class="topbar">
+    <div class="topbar-left">
+      <strong>${escapeHtml(s.companyName)}</strong>
+      <span class="badge">${sector.icon} ${sector.label}</span>
+      <span class="badge">${diff.icon} ${diff.label}</span>
+    </div>
+    <div class="topbar-right">
+      <span class="month-pill">Mois ${s.month}</span>
+      <button class="btn-ghost" onclick="confirmNewGame()">Nouvelle partie</button>
+    </div>
+  </header>
+  <div class="wrap">
+    ${dashboard}
+    ${charts}
+    <section class="main-columns">
+      ${decisionsPanel}
+      ${historyPanel}
+    </section>
+  </div>
+  ${modal}`;
+}
+
+function drawSparkline(canvas, points, color){
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio||1;
+  const cw = canvas.clientWidth||260, ch = canvas.clientHeight||90;
+  canvas.width = cw*dpr; canvas.height = ch*dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!points || points.length<2){
+    ctx.fillStyle = '#6b7690'; ctx.font = (12*dpr)+'px sans-serif';
+    ctx.fillText('Pas encore assez de données', 8*dpr, 20*dpr);
+    return;
+  }
+  const min = Math.min(...points,0);
+  const max = Math.max(...points,1);
+  const range = (max-min)||1;
+  const pad = 8*dpr;
+  const w = canvas.width, h = canvas.height;
+  ctx.beginPath();
+  points.forEach((v,i)=>{
+    const x = pad + (w-2*pad)*(i/(points.length-1));
+    const y = h-pad - (h-2*pad)*((v-min)/range);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle = color; ctx.lineWidth = 2*dpr;
+  ctx.lineJoin = 'round'; ctx.stroke();
+  ctx.lineTo(w-pad, h-pad); ctx.lineTo(pad, h-pad); ctx.closePath();
+  ctx.fillStyle = color+'22'; ctx.fill();
+}
+
+function renderCharts(){
+  const s = G.state; if(!s) return;
+  drawSparkline(document.getElementById('chartCash'), s.chart.map(p=>p.cash), '#22c55e');
+  drawSparkline(document.getElementById('chartRevenue'), s.chart.map(p=>p.revenue), '#3b82f6');
+  drawSparkline(document.getElementById('chartValuation'), s.chart.map(p=>p.valuation), '#a855f7');
+  drawSparkline(document.getElementById('chartPersonal'), s.chart.map(p=>p.personalCash), '#f59e0b');
+}
+</script>
+</body>
+</html>
