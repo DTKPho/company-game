@@ -41,9 +41,10 @@
   .form-section label{display:block;font-weight:600;margin:20px 0 8px;color:#cdd6e8;}
   #companyNameInput{width:100%;padding:12px;font-size:15px;}
   .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
-  .opt-card{background:var(--panel);border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:.15s;}
-  .opt-card:hover{border-color:#3a4a6a;}
-  .opt-card.selected{border-color:var(--green);background:#132318;}
+  .opt-card{background:var(--panel);border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;
+    transition:border-color .15s, transform .12s, box-shadow .12s;}
+  .opt-card:hover{border-color:#3a4a6a;transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.22);}
+  .opt-card.selected{border-color:var(--green);background:#132318;box-shadow:0 0 0 1px rgba(34,197,94,.25);}
   .opt-card .oc-title{font-weight:700;font-size:15px;margin-bottom:4px;}
   .opt-card .oc-desc{color:var(--muted);font-size:12.5px;line-height:1.5;}
   .start-cta{margin-top:28px;text-align:center;}
@@ -56,7 +57,9 @@
   .month-pill{background:#0d1220;border:1px solid var(--border);border-radius:20px;padding:5px 14px;color:var(--text);font-weight:600;}
 
   .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0;}
-  .stat-card{background:var(--panel);border-radius:12px;padding:14px 16px;border-left:4px solid var(--border);}
+  .stat-card{background:var(--panel);border-radius:12px;padding:14px 16px;border-left:4px solid var(--border);
+    box-shadow:0 2px 10px rgba(0,0,0,.18);transition:transform .12s, box-shadow .12s;}
+  .stat-card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.28);}
   .stat-card .sc-label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
   .stat-card .sc-value{font-size:21px;font-weight:700;margin-top:4px;}
   .stat-card .sc-sub{color:var(--muted);font-size:12px;margin-top:4px;}
@@ -73,7 +76,7 @@
 
   .main-columns{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start;}
   @media(max-width:900px){.main-columns{grid-template-columns:1fr;}}
-  .panel{background:var(--panel);border-radius:12px;padding:16px 18px;margin-bottom:16px;}
+  .panel{background:var(--panel);border-radius:12px;padding:16px 18px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.16);}
   .decision-block{border-top:1px solid var(--border);padding:14px 0;}
   .decision-block:first-child{border-top:none;padding-top:0;}
   .decision-block h3{font-size:14.5px;}
@@ -96,6 +99,26 @@
   .advance-btn{width:100%;margin-top:6px;}
   .explosion-hint{background:#2a1a08;border:1px solid #6b3d0c;color:#ffb454;border-radius:10px;
     padding:10px 12px;font-size:12.5px;margin-bottom:14px;}
+
+  .advisor-panel{background:linear-gradient(135deg,#1a1530,#171d2b 65%);border:1px solid #3d2a5c;
+    border-radius:14px;padding:16px 18px;margin-bottom:18px;box-shadow:0 4px 18px rgba(124,58,237,.08);}
+  .advisor-panel h3{font-size:14.5px;margin-bottom:4px;color:#dcc4ff;}
+  .advisor-panel .ap-sub{color:var(--muted);font-size:12px;margin-bottom:12px;}
+  .advisor-list{display:flex;flex-direction:column;gap:9px;}
+  .advisor-item{display:flex;gap:10px;background:rgba(255,255,255,.03);border-radius:10px;
+    padding:10px 12px;border-left:3px solid var(--border);}
+  .advisor-item .ai-icon{font-size:17px;line-height:1.3;}
+  .advisor-item .ai-title{font-weight:700;font-size:13px;margin-bottom:2px;}
+  .advisor-item .ai-detail{font-size:12.5px;color:var(--muted);line-height:1.5;}
+  .advisor-item.lvl-urgent{border-color:var(--red);}
+  .advisor-item.lvl-good{border-color:var(--green);}
+  .advisor-item.lvl-info{border-color:var(--purple);}
+  .recommended-tag{display:inline-block;background:rgba(34,197,94,.15);color:#4ade80;
+    border:1px solid rgba(34,197,94,.4);border-radius:20px;padding:1px 9px;font-size:10.5px;
+    font-weight:700;margin-left:8px;letter-spacing:.02em;vertical-align:middle;}
+  .explosion-choices button.is-recommended{border-color:var(--green);background:#132318;}
+  .version-tag{color:var(--muted);font-size:11px;font-weight:400;margin-left:8px;vertical-align:middle;}
+  .changelog-note{color:#9dd7c0;font-size:12px;margin-bottom:18px;}
 
   .history-list{display:flex;flex-direction:column;gap:8px;max-height:640px;overflow-y:auto;}
   .hist-item{background:var(--panel2);border-radius:8px;padding:8px 10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--border);}
@@ -132,6 +155,8 @@
 
 <script>
 /* ============================= DONNÉES DE JEU ============================= */
+
+const GAME_VERSION = '1.1';
 
 const SECTORS = {
   saas: {
@@ -320,6 +345,74 @@ function monthlyBurnEstimate(s){
   const salaries = s.employees.reduce((sum,e)=>sum+ROLES[e.role].salary,0);
   const burn = salaries+sector.fixedCosts+s.marketingBudget - s.revenue*effectiveGrossMargin(s);
   return Math.max(1, burn);
+}
+
+/* ============================= CONSEILLER STRATÉGIQUE (mode Explosion garantie) ============================= */
+// S'appuie sur les mêmes fonctions que le moteur économique (aucune règle "inventée à part") :
+// la recommandation affichée correspond toujours exactement à ce que le jeu calcule en interne.
+
+function computeAdvice(s){
+  const sector = SECTORS[s.sectorKey];
+  const advice = [];
+  const runway = s.cash>0 ? s.cash/monthlyBurnEstimate(s) : 0;
+  const capacity = acquisitionCapacity(s);
+  const efficiency = acquisitionEfficiencyFor(s, s.marketingBudget);
+  const roles = countRoles(s.employees);
+
+  if(runway < 4){
+    const safeBudget = capMarketingToRunway(s, s.marketingBudget, 5);
+    advice.push({level:'urgent', icon:'🚨', title:'Trésorerie fragile',
+      detail:`Il vous reste ~${Math.max(0,Math.round(runway))} mois de trésorerie. Baissez le budget marketing vers ${fmtEUR(safeBudget)}/mois et ne recrutez pas tant que le coussin n'est pas reconstitué.`});
+  } else {
+    if(efficiency < 0.5){
+      const target = capMarketingToRunway(s, efficientMarketingBudget(s,0.65), 6);
+      if(target > s.marketingBudget*1.15){
+        advice.push({level:'good', icon:'📣', title:'Augmentez le budget marketing',
+          detail:`Votre budget n'exploite que ${fmtPct(efficiency,0)} de votre capacité d'acquisition (~${Math.round(capacity)} ${sector.unitLabel}/mois). Vous pouvez monter à environ ${fmtEUR(target)}/mois en gardant 6 mois de trésorerie d'avance.`});
+      }
+    } else if(efficiency > 0.85 && canAffordHire(s,'sales',7)){
+      advice.push({level:'good', icon:'🧑‍💼', title:'Recrutez un Commercial',
+        detail:`Votre budget marketing sature déjà votre capacité d'acquisition (${fmtPct(efficiency,0)} d'efficacité). Un Commercial ajoute de la capacité — le prochain levier de croissance disponible.`});
+    }
+
+    if(runway>9 && roles.tech===0 && s.revenue > sector.fixedCosts*3 && canAffordHire(s,'tech',9)){
+      advice.push({level:'info', icon:'🛠️', title:'Envisagez un profil Tech',
+        detail:`Trésorerie confortable (~${Math.round(runway)} mois d'avance). Un profil Tech améliore la marge et réduit le churn, utile pour arriver plus gros au moment du pic.`});
+    }
+
+    if(runway > 16 && s.cash > sector.startCash*1.5 && advice.length===0){
+      advice.push({level:'info', icon:'💡', title:'Trésorerie très confortable',
+        detail:`Vous avez largement plus que nécessaire (~${Math.round(runway)} mois d'avance). Vous pouvez pousser marketing ou embauches plus fort sans risque immédiat.`});
+    }
+  }
+
+  if(!s.explosionTriggered){
+    if(s.month>=9 && s.month<12){
+      advice.push({level:'info', icon:'🌋', title:'La fenêtre approche',
+        detail:`L'hypercroissance garantie peut survenir à partir du mois 12. Plus votre base clients est grande au moment du pic, plus l'effet multiplicateur (×3,5 à ×6) rapporte gros.`});
+    } else if(s.month>=12){
+      advice.push({level:'info', icon:'🌋', title:'Fenêtre d’hypercroissance active',
+        detail:`Le pic peut désormais tomber n'importe quel mois (au plus tard le mois 30). Continuez à croître sainement : le multiplicateur s'applique à votre base clients au moment T.`});
+    }
+  }
+
+  if(advice.length===0){
+    advice.push({level:'good', icon:'✅', title:'Trajectoire saine',
+      detail:`Vos réglages actuels sont cohérents avec vos moyens. Continuez à surveiller la trésorerie chaque mois.`});
+  }
+
+  return advice;
+}
+
+function computeExplosionChoiceAdvice(s){
+  const runway = s.cash>0 ? s.cash/monthlyBurnEstimate(s) : 0;
+  if(runway < 3){
+    return {choice:'buyout', reason:'Votre trésorerie est tendue : encaisser du cash personnel maintenant sécurise vos gains, sans dépendre de la survie de l’entreprise.'};
+  }
+  if(s.playerEquity < 0.55){
+    return {choice:'independent', reason:'Vous avez déjà pas mal dilué votre capital. Rester indépendant protège la part qu’il vous reste.'};
+  }
+  return {choice:'funding', reason:'Trésorerie saine et part du capital encore confortable : c’est le meilleur moment pour lever à une valorisation gonflée et accélérer fort.'};
 }
 
 function estimateValuation(s){
@@ -817,8 +910,9 @@ function renderStartHTML(){
 
   return `
   <div class="wrap start-screen">
-    <h1>🏢 Fondateur — Simulateur d'entreprise</h1>
+    <h1>🏢 Fondateur — Simulateur d'entreprise<span class="version-tag">v${GAME_VERSION}</span></h1>
     <p class="subtitle">Démarrez votre société, prenez les bonnes décisions mois après mois, et construisez une valorisation qui compte.</p>
+    <p class="changelog-note">🆕 v${GAME_VERSION} — Conseiller stratégique en mode Explosion garantie, retouches visuelles.</p>
     ${banner}
     <div class="form-section">
       <label for="companyNameInput">Nom de l'entreprise</label>
@@ -890,6 +984,22 @@ function renderGameHTML(){
       <div class="sc-sub">${s.investors.length} investisseur(s) au capital</div>
     </div>
   </section>`;
+
+  const advisorPanel = (diff.guaranteedExplosion && !s.gameOver && !s.pendingExplosionChoice) ? `
+  <section class="advisor-panel">
+    <h3>🧭 Conseiller stratégique — Explosion garantie</h3>
+    <div class="ap-sub">Recommandations calculées à partir de votre trésorerie, votre capacité d'acquisition et votre position actuelles.</div>
+    <div class="advisor-list">
+      ${computeAdvice(s).map(a=>`
+        <div class="advisor-item lvl-${a.level}">
+          <span class="ai-icon">${a.icon}</span>
+          <div>
+            <div class="ai-title">${a.title}</div>
+            <div class="ai-detail">${a.detail}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+  </section>` : '';
 
   const charts = `
   <section class="charts-grid">
@@ -1011,15 +1121,19 @@ function renderGameHTML(){
 
   let modal = '';
   if(s.pendingExplosionChoice){
+    const rec = computeExplosionChoiceAdvice(s);
+    const tag = k => k===rec.choice ? '<span class="recommended-tag">⭐ Conseillé</span>' : '';
+    const cls = k => k===rec.choice ? 'is-recommended' : '';
     modal = `
     <div class="overlay">
       <div class="modal">
         <h2>🚀 Hypercroissance !</h2>
         <p>${escapeHtml(s.companyName)} explose en popularité. C'est le moment de choisir votre trajectoire.</p>
+        <p class="hint">🧭 Conseil : ${rec.reason}</p>
         <div class="explosion-choices">
-          <button onclick="chooseExplosionFunding()"><b>💰 Lever des fonds massivement</b><span>Levée importante (~30% de la valorisation), forte dilution mais trésorerie boostée pour accélérer.</span></button>
-          <button onclick="chooseExplosionBuyout()"><b>🤝 Céder une partie de vos parts (secondaire)</b><span>Vendez ~20% de vos propres parts, cash immédiat sur votre compte personnel.</span></button>
-          <button onclick="chooseExplosionIndependent()"><b>🧭 Rester indépendant</b><span>Aucune dilution, vous gardez le contrôle total et poursuivez seul.</span></button>
+          <button class="${cls('funding')}" onclick="chooseExplosionFunding()"><b>💰 Lever des fonds massivement${tag('funding')}</b><span>Levée importante (~30% de la valorisation), forte dilution mais trésorerie boostée pour accélérer.</span></button>
+          <button class="${cls('buyout')}" onclick="chooseExplosionBuyout()"><b>🤝 Céder une partie de vos parts (secondaire)${tag('buyout')}</b><span>Vendez ~20% de vos propres parts, cash immédiat sur votre compte personnel.</span></button>
+          <button class="${cls('independent')}" onclick="chooseExplosionIndependent()"><b>🧭 Rester indépendant${tag('independent')}</b><span>Aucune dilution, vous gardez le contrôle total et poursuivez seul.</span></button>
         </div>
       </div>
     </div>`;
@@ -1076,12 +1190,14 @@ function renderGameHTML(){
       <span class="badge">${diff.icon} ${diff.label}</span>
     </div>
     <div class="topbar-right">
+      <span class="version-tag">v${GAME_VERSION}</span>
       <span class="month-pill">Mois ${s.month}</span>
       <button class="btn-ghost" onclick="confirmNewGame()">Nouvelle partie</button>
     </div>
   </header>
   <div class="wrap">
     ${dashboard}
+    ${advisorPanel}
     ${charts}
     <section class="main-columns">
       ${decisionsPanel}
